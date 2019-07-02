@@ -6,14 +6,14 @@ size         := [ 1000, 600 ]
 rect         := size.clone(), rect.insertAt( 1, 0, 0 )
 rect2        := rect.clone(), rect2.1 += 100, rect2.2 += 100, rect2.3 -= 200, rect2.4 -= 200
 
-GUI, new
-GUI, +hwndGUI1 -Caption +ToolWindow
-Gui,Show,% "w" . size.1 . " h" . size.2
-SetFormat ,IntegerFast ,H
+GUI1 := GuiCreate()
+GUI1.Opt("-Caption")
+GUI1.Opt("+ToolWindow")
+GUI1.Show("w" . size.1 . " h" . size.2)
 
-hDC          := new GDI.DC( GUI1 )
+hDC          := new GDI.DC( GUI1.hwnd )
 testGraphics := hDC.getGraphics()
-GoTo,Paint
+GoTo Paint
 
 F5::
 Paint:
@@ -27,8 +27,8 @@ testGraphics.resetClip()
 return
 
 ~LButton::
-If WinActive( "ahk_id " . GUI1 )
-	GoTo, Paint
+If WinActive( "ahk_id " . GUI1.hwnd )
+	GoTo Paint
 esc::
 GUIClose:
 ExitApp
@@ -36,9 +36,9 @@ ExitApp
 randomColor( A := 255 )
 {
 	if ( A == "" )
-		Random,A,0,255
-	Random,R,0,255
-	Random,G,0,255
-	Random,B,0,255
+		A:= Random(0,255)
+	R:=Random(0,255)
+	G:=Random(0,255)
+	B:=Random(0,255)
 	return ( A << 24 ) | ( R << 16 ) | ( G << 8 ) | B 
 }

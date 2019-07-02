@@ -61,8 +61,7 @@ class GDIp
 		}
 	}
 	
-	class Bitmap
-	{
+	class Bitmap {
 		
 		__New( filePathOrSize )
 		{
@@ -99,6 +98,9 @@ class GDIp
 			return This.ptr
 		}
 		
+		gethDC() {
+		}
+		
 		getSize()
 		{
 			DllCall( "gdiplus\GdipGetImageWidth",  "Ptr", This.ptr, "UInt*", w )
@@ -119,7 +121,7 @@ class GDIp
 			DllCall( "gdiplus\GdipGetImageEncodersSize", "UInt*", nCount, "UInt*", nSize )
 			VarSetCapacity( ci, nSize )
 			DllCall( "gdiplus\GdipGetImageEncoders", "UInt", nCount, "UInt", nSize, "Ptr", &ci )
-			Loop, %nCount%
+			Loop nCount
 			{
 				sString := StrGet( NumGet( ci, ( idx := ( 48 + 7 * A_PtrSize ) * ( A_Index - 1 ) ) + 32 + 3 * A_PtrSize ), "UTF-16" )
 				if InStr( sString, "*" . Extension )
@@ -132,8 +134,7 @@ class GDIp
 		}
 	}
 	
-	class Graphics
-	{
+	class Graphics {
 		
 		__New( bitmapOrDC )
 		{
@@ -196,14 +197,16 @@ class GDIp
 			return DllCall( "gdiplus\GdipSetTextRenderingHint", "Ptr", This.ptr, "UInt", textRenderingHint )
 		}
 		
-		clear( color = 0 )
+		clear( color := 0 )
 		{
 			return DllCall("gdiplus\GdipGraphicsClear", "Ptr", This.ptr, "UInt", color )
 		}
 		
-		getpGraphics()
-		{
+		getpGraphics() {
 			return This.ptr
+		}
+		
+		gethDC() {
 		}
 		
 		rotateCanvasTableAroundPoint( x, y, angle )
@@ -251,7 +254,7 @@ class GDIp
 			FillMode: 1 or 0 Don't really know what it does though
 		*/
 		
-		fillPolygon( brush, points, fillMode=0 )
+		fillPolygon( brush, points, fillMode := 0 )
 		{
 			VarSetCapacity( pointBuffer, 8 * points.Length(), 0 )
 			For pointNr, point in points
@@ -290,7 +293,7 @@ class GDIp
 		drawLines( pen, points )
 		{
 			points := points.clone()
-			Loop % points.Length() - 1
+			Loop (points.Length() - 1)
 				This.drawLine( pen, points ), points.removeAt( 1 )
 		}
 		
@@ -326,7 +329,7 @@ class GDIp
 			if ret
 				return ret
 			outData := { rect: [], lines: linesFitted, chars: codePointsFitted }
-			Loop, 4
+			Loop 4
 				outData.rect.Push( numGet( outputRectF, A_Index * 4 -4, "float" ) )
 			return outData
 		}
@@ -375,8 +378,7 @@ class GDIp
 		
 	}
 	
-	class ImageAttributes
-	{
+	class ImageAttributes {
 		
 		__New()
 		{
@@ -410,8 +412,7 @@ class GDIp
 		
 	}
 	
-	class SolidBrush
-	{
+	class SolidBrush {
 		
 		__New( color )
 		{
@@ -455,8 +456,7 @@ class GDIp
 		
 	}
 	
-	class LinearGradientBrush extends GDIp.SolidBrush
-	{
+	class LinearGradientBrush extends GDIp.SolidBrush {
 		
 		/*
 			creates a new LinearGradientBrush
@@ -525,8 +525,7 @@ class GDIp
 		
 	}
 	
-	class Pen
-	{
+	class Pen {
 		__New( brushOrColor, width )
 		{
 			if isObject( brushOrColor )
@@ -583,7 +582,7 @@ class GDIp
 			return color
 		}
 		
-		setBrush( brush = "" )
+		setBrush( brush := "" )
 		{
 			if ( This.hasKey( "brush" ) && brush )
 				This.brush := brush
@@ -597,8 +596,7 @@ class GDIp
 		
 	}
 	
-	class FontFamily
-	{
+	class FontFamily {
 		
 		__New( name )
 		{
@@ -614,6 +612,9 @@ class GDIp
 			return This.ptr
 		}
 		
+		gethDC() {
+		}
+		
 		__Delete()
 		{
 			DllCall( "gdiplus\GdipDeleteFontFamily", "UPtr", This.ptr )
@@ -623,10 +624,8 @@ class GDIp
 		
 	}
 	
-	class Font
-	{
-		
-		__New( fontFamilyOrDC, size = "" )
+	class Font {		
+		__New( fontFamilyOrDC, size := "" )
 		{
 			if ( hDC := fontFamilyOrDC.gethDC() )
 				ret := DllCall( "gdiplus\GdipCreateFontFromDC", "UPtr", hDC, "UPtr*", pFont )
@@ -652,8 +651,7 @@ class GDIp
 		
 	}
 	
-	class StringFormat
-	{
+	class StringFormat {
 		
 		/*
 			formatFlags: Defines some settings of the StringFormat object 
@@ -716,7 +714,7 @@ class GDI
 		
 		__New( hWND )
 		{
-			if !hDC  := DllCall( "GetDC", "Ptr", hWND, "Ptr" )
+			if !hDC  := DllCall( "GetDC", "UPtr", hWND, "UPtr" )
 				return
 			This.hWND := hWND
 			This.hDC  := hDC
@@ -733,7 +731,13 @@ class GDI
 		{
 			return This.hDC
 		}
+
+		getpBitmap() {
+		}
 		
+		getpGraphics() {
+		}
+
 		getGraphics()
 		{
 			if !( This.hasKey( "pGraphics" ) )

@@ -81,7 +81,7 @@ class indirectReference
 		}
 	}
 	
-	Call( functionName = "", parameters* )
+	Call( functionName := "", parameters* )
 	{
 		if !( indirectReference.baseModes.hasKey( functionName ) && !This.base.hasKey( functionName ) )
 			return ( new directReference( This ) )[ functionName ]( parameters* )
